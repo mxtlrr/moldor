@@ -1,20 +1,11 @@
 import requests
 from curses import *
+from moldor_utils import *
 
 board = ""
 
-# Fixes the shitty html and gives it in a nice readable format.
-def clean_up_comments(comment) -> str:
-    n = comment.replace("<br>","\n").replace("&#039;t", "'").replace("&#039;d", "'").replace("&gt;", ">").replace("&#039;m", "'").replace('<span class="quote">', ">").replace("</span>", "").replace("<s>","~~").replace("</s>", "~~").replace("&#039;", "'").replace("&quot;", "\"")
-    return n
-
 ## Request data for the threads
 h = {'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT'}
-
-def clear_scr(stdscr):
-    stdscr.erase()
-    stdscr.refresh()
-
 
 def main():
     # start up curses
@@ -70,16 +61,13 @@ def main():
         if c == 101: running = False # Leave
         elif c == 112: # Previous post
             if thread_no != 0: thread_no -= 1
-            stdscr.erase()
-            stdscr.refresh()
+            clear_scr(stdscr)
         elif c == 110: # Next post
             thread_no += 1
-            stdscr.erase()
-            stdscr.refresh()
+            clear_scr(stdscr)
         elif c == 118: # View replies
             # clear screen
-            stdscr.erase()
-            stdscr.refresh()
+            clear_scr(stdscr)
 
             new_running = True
             reply_no = 1 # OPs = 0, first reply = 1 
@@ -111,8 +99,6 @@ def main():
                 elif c == 110: # next
                     if reply_no+1 != replies+1: reply_no+=1
                     clear_scr(stdscr)
-
-
     endwin()
 
 if __name__ == "__main__":
