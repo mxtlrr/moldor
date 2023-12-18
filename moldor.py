@@ -11,6 +11,11 @@ def clean_up_comments(comment) -> str:
 ## Request data for the threads
 h = {'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT'}
 
+def clear_scr(stdscr):
+    stdscr.erase()
+    stdscr.refresh()
+
+
 def main():
     # start up curses
     stdscr = initscr()
@@ -62,15 +67,52 @@ def main():
 
         stdscr.addstr("View replies (V), exit (E) or next (N)/ prev (P) post?") 
         c = stdscr.getch()
-        if c == 101: running = False
-        elif c == 112:
+        if c == 101: running = False # Leave
+        elif c == 112: # Previous post
             if thread_no != 0: thread_no -= 1
             stdscr.erase()
             stdscr.refresh()
-        elif c == 110:
+        elif c == 110: # Next post
             thread_no += 1
             stdscr.erase()
             stdscr.refresh()
+        elif c == 118: # View replies
+            # clear screen
+            stdscr.erase()
+            stdscr.refresh()
+
+            new_running = True
+            reply_no = 1 # OPs = 0, first reply = 1 
+            replies  = posts[0]['replies']
+            while new_running:
+                # N - next reply
+                # P - prev reply
+                # E - go back
+                stdscr.addstr(f"<{reply_no+1}/{replies+1}>")    
+                
+                _name = posts[reply_no]['name']
+                _date = posts[reply_no]['now']
+                _fix_cont = clean_up_comments(posts[reply_no]['com'])
+                stdscr.addstr(f"{_name} {_date}\n{_fix_cont}\n\n")
+                stdscr.addstr("(N)ext reply, (P)revious reply, (E)xit?")
+                    
+                c = stdscr.getch()
+
+                if c == 101:
+                    # Clear screen then exit
+                    stdscr.erase()
+                    stdscr.refresh()
+                    new_running = False
+
+                elif c == 112: # previous
+                    if reply_no != 0: reply_no -= 1
+                    clear_scr(stdscr)
+
+                elif c == 110: # next
+                    if reply_no+1 != replies+1: reply_no+=1
+                    clear_scr(stdscr)
+
+
     endwin()
 
 if __name__ == "__main__":
