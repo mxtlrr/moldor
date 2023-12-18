@@ -5,7 +5,7 @@ board = ""
 
 # Fixes the shitty html and gives it in a nice readable format.
 def clean_up_comments(comment) -> str:
-    n = comment.replace("<br>","\n").replace("&#039;t", "'").replace("&#039;d", "'").replace("&gt;", ">").replace("&#039;m", "'").replace('<span class="quote">', "").replace("</span>", "").replace("<s>","~~").replace("</s>", "~~").replace("&#039;", "'").replace("&quot;", "\"")
+    n = comment.replace("<br>","\n").replace("&#039;t", "'").replace("&#039;d", "'").replace("&gt;", ">").replace("&#039;m", "'").replace('<span class="quote">', ">").replace("</span>", "").replace("<s>","~~").replace("</s>", "~~").replace("&#039;", "'").replace("&quot;", "\"")
     return n
 
 ## Request data for the threads
@@ -37,7 +37,8 @@ def main():
     threads = _r[0]['threads']
 
     thread_no = 0
-    while True:
+    running = True
+    while running:
         stdscr.addstr(f"<{thread_no}/{len(threads)}>\n")
 
         thread_id = threads[thread_no]['no']
@@ -61,14 +62,15 @@ def main():
 
         stdscr.addstr("View replies (V), exit (E) or next (N)/ prev (P) post?") 
         c = stdscr.getch()
-        match c:
-            case 101: break # E key
-            case 110: # next post
-                thread_no += 1
-                # clear window
-                stdscr.erase()
-                stdscr.refresh()
-            case _: print(c)
+        if c == 101: running = False
+        elif c == 112:
+            if thread_no != 0: thread_no -= 1
+            stdscr.erase()
+            stdscr.refresh()
+        elif c == 110:
+            thread_no += 1
+            stdscr.erase()
+            stdscr.refresh()
     endwin()
 
 if __name__ == "__main__":
